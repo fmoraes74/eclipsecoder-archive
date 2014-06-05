@@ -136,6 +136,33 @@ public class ArchiveListView extends ViewPart {
 			}
 		});
 
+    MenuItem practiceItem = new MenuItem(rightClickMenu, SWT.PUSH);
+    practiceItem.setText(Messages.practice);
+    practiceItem.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        final ProblemStats stats = (ProblemStats) ((IStructuredSelection) viewer.getSelection())
+            .getFirstElement();
+        if (stats == null) {
+          return;
+        }
+
+        if (!EclipseCoderPlugin.isTcAccountSpecified()) {
+          EclipseCoderPlugin.demandTcAccountSpecified();
+          return;
+        }
+
+        Job job;
+        if ((new File(new File(System.getProperty("user.home")), ".enablefetchmarker")).exists()) {
+          job = new ProblemFetcherJob(stats);
+        } else {
+          job = new SubmissionListFetcherJob(stats);
+        }
+        job.setUser(true);
+        job.schedule();
+      }
+    });
+
 		viewer.getTable().setMenu(rightClickMenu);
 
 		for (String columnTitle : ProblemStats.COLUMN_NAMES) {

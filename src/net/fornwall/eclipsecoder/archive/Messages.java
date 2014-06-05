@@ -65,5 +65,6 @@ public class Messages extends NLS {
 	public static String useLanguageActionName;
 	public static String viewMatchEditorial;
 	public static String viewSubmissionList;
+	public static String practice;
 
 }

@@ -1,7 +1,6 @@
 package net.fornwall.eclipsecoder.archive;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,14 +11,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,16 +108,16 @@ class ProblemScraper {
 	}
 
 	/** Utility method for encoding key-value parameters */
-	private static String getEncoded(Map<String, String> parameters) throws UnsupportedEncodingException {
-		StringBuilder builder = new StringBuilder();
-		for (Map.Entry<String, String> mapEntry : parameters.entrySet()) {
-			if (builder.length() != 0)
-				builder.append('&');
-			builder.append(URLEncoder.encode(mapEntry.getKey(), "UTF-8") + "=" //$NON-NLS-1$ //$NON-NLS-2$
-					+ URLEncoder.encode(mapEntry.getValue(), "UTF-8")); //$NON-NLS-1$
-		}
-		return builder.toString();
-	}
+//	private static String getEncoded(Map<String, String> parameters) throws UnsupportedEncodingException {
+//		StringBuilder builder = new StringBuilder();
+//		for (Map.Entry<String, String> mapEntry : parameters.entrySet()) {
+//			if (builder.length() != 0)
+//				builder.append('&');
+//			builder.append(URLEncoder.encode(mapEntry.getKey(), "UTF-8") + "=" //$NON-NLS-1$ //$NON-NLS-2$
+//					+ URLEncoder.encode(mapEntry.getValue(), "UTF-8")); //$NON-NLS-1$
+//		}
+//		return builder.toString();
+//	}
 
 	/**
 	 * Return the file used to store the problem list in a serialized format.
@@ -256,42 +251,43 @@ class ProblemScraper {
 		return -1;
 	}
 
-	private String httpCookies;
+//	private String httpCookies;
 
+	@SuppressWarnings("unused")
 	ProblemScraper(String username, String password) throws Exception {
-		URL url = new URL("https://community.topcoder.com/tc"); //$NON-NLS-1$
-
-		URLConnection urlConn = url.openConnection();
-		urlConn.setDoOutput(true);
-		urlConn.setUseCaches(false);
-
-		Map<String, String> parameters = new HashMap<String, String>();
-		parameters.put("username", username); //$NON-NLS-1$
-		parameters.put("password", password); //$NON-NLS-1$
-		parameters.put("module", "Login"); //$NON-NLS-1$ //$NON-NLS-2$
-		parameters.put("rem", "on"); //$NON-NLS-1$ //$NON-NLS-2$
-		parameters.put("nextpage", "http://www.topcoder.com/tc"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		DataOutputStream printout = new DataOutputStream(urlConn.getOutputStream());
-		printout.writeBytes(getEncoded(parameters));
-		printout.flush();
-		printout.close();
-
-		List<String> setCookieList = urlConn.getHeaderFields().get("Set-Cookie"); //$NON-NLS-1$
-		StringBuilder httpCookieBuilder = new StringBuilder();
-		if (setCookieList != null) {
-			for (String aCookie : setCookieList) {
-				if (httpCookieBuilder.length() > 0) {
-					httpCookieBuilder.append("; ");
-				}
-				httpCookieBuilder.append(aCookie);
-			}
-		}
-		if (httpCookieBuilder.length() == 0 || readAll(urlConn.getInputStream()).contains("TopCoder | Login")) { //$NON-NLS-1$
-			throw new LoginException(Messages.noSessionIdCheckYourCredentials);
-		} else {
-			httpCookies = httpCookieBuilder.toString();
-		}
+//		URL url = new URL("https://community.topcoder.com/tc"); //$NON-NLS-1$
+//
+//		URLConnection urlConn = url.openConnection();
+//		urlConn.setDoOutput(true);
+//		urlConn.setUseCaches(false);
+//
+//		Map<String, String> parameters = new HashMap<String, String>();
+//		parameters.put("username", username); //$NON-NLS-1$
+//		parameters.put("password", password); //$NON-NLS-1$
+//		parameters.put("module", "Login"); //$NON-NLS-1$ //$NON-NLS-2$
+//		parameters.put("rem", "on"); //$NON-NLS-1$ //$NON-NLS-2$
+//		parameters.put("nextpage", "http://www.topcoder.com/tc"); //$NON-NLS-1$ //$NON-NLS-2$
+//
+//		DataOutputStream printout = new DataOutputStream(urlConn.getOutputStream());
+//		printout.writeBytes(getEncoded(parameters));
+//		printout.flush();
+//		printout.close();
+//
+//		List<String> setCookieList = urlConn.getHeaderFields().get("Set-Cookie"); //$NON-NLS-1$
+//		StringBuilder httpCookieBuilder = new StringBuilder();
+//		if (setCookieList != null) {
+//			for (String aCookie : setCookieList) {
+//				if (httpCookieBuilder.length() > 0) {
+//					httpCookieBuilder.append("; ");
+//				}
+//				httpCookieBuilder.append(aCookie);
+//			}
+//		}
+//		if (httpCookieBuilder.length() == 0 || readAll(urlConn.getInputStream()).contains("TopCoder | Login")) { //$NON-NLS-1$
+//			throw new LoginException(Messages.noSessionIdCheckYourCredentials);
+//		} else {
+//			httpCookies = httpCookieBuilder.toString();
+//		}
 	}
 
 	/**
@@ -305,40 +301,59 @@ class ProblemScraper {
 	public List<StringPair> getExamples(ProblemStats problem) throws Exception {
 		List<StringPair> result = new ArrayList<StringPair>();
 
-		// we need a coder and room id of a correct submission to obtain the
-		// test cases.
-		String page = getPage("community", "tc?module=ProblemDetail&rd=" //$NON-NLS-1$
-				+ problem.roundId + "&pm=" + problem.problemId); //$NON-NLS-1$
+//		// we need a coder and room id of a correct submission to obtain the
+//		// test cases.
+//		String page = getPage("community", "tc?module=ProblemDetail&rd=" //$NON-NLS-1$
+//				+ problem.roundId + "&pm=" + problem.problemId); //$NON-NLS-1$
+//
+//		// the problem detail page, links to the top submission of each language
+//		// - any will do
+//		String coderIdMatch = Utilities.getMatch(page, "problem_solution.*cr=(\\d+)", 1); //$NON-NLS-1$
+//		if (coderIdMatch == null) {
+//			// no solution found - no examples can be extracted
+//			return result;
+//		}
+//		int coderId = Integer.parseInt(coderIdMatch);
+//		page = getPage("apps", "stat?c=problem_solution&cr=" + coderId + "&rd=" //$NON-NLS-1$ //$NON-NLS-2$
+//				+ problem.roundId + "&pm=" //$NON-NLS-1$
+//				+ problem.problemId);
+//
+//		if (page.contains("Solution Not Available")) { //$NON-NLS-1$
+//			return null;
+//		}
 
-		// the problem detail page, links to the top submission of each language
-		// - any will do
-		String coderIdMatch = Utilities.getMatch(page, "problem_solution.*cr=(\\d+)", 1); //$NON-NLS-1$
-		if (coderIdMatch == null) {
-			// no solution found - no examples can be extracted
-			return result;
-		}
-		int coderId = Integer.parseInt(coderIdMatch);
-		page = getPage("apps", "stat?c=problem_solution&cr=" + coderId + "&rd=" //$NON-NLS-1$ //$NON-NLS-2$
-				+ problem.roundId + "&pm=" //$NON-NLS-1$
-				+ problem.problemId);
+		String page = getPage("community", "stat?c=problem_statement&pm=" +//$NON-NLS-1$ //$NON-NLS-2$
+				problem.problemId);
 
-		if (page.contains("Solution Not Available")) { //$NON-NLS-1$
-			return null;
-		}
-
-		Matcher matcher = Pattern.compile("(?i)(?s)<tr valign=\"top\">.*?</tr>").matcher(page); //$NON-NLS-1$
-		while (matcher.find()) {
-			Matcher m = Pattern.compile("(?i)(?s)<td[^>]*?statText[^>]+>([^<]+)<").matcher( //$NON-NLS-1$
+		Matcher matcher = Pattern.compile("(?i)(?s)<h3>Examples<\\/h3>.*?This problem statement is the exclusive").matcher(page); //$NON-NLS-1$
+		if (matcher.find()) {
+			Matcher m = Pattern.compile("(?i)(?s)nowrap=\"true\" class=\"statText\">(\\d)+\\).+?<pre>Returns: .+?<\\/pre><\\/td>").matcher( //$NON-NLS-1$
 					matcher.group());
-			m.find();
-			String parameterString = m.group(1);
-			m.find();
-			String expectedString = m.group(1);
-			if (expectedString.startsWith("<span class=bigRed>")) { //$NON-NLS-1$
-				// failed system test - abort
-				return result;
+//			m.find();
+//			String parameterString = m.group(1);
+//			m.find();
+//			String expectedString = m.group(1);
+//			if (expectedString.startsWith("<span class=bigRed>")) { //$NON-NLS-1$
+//				// failed system test - abort
+//				return result;
+			while(m.find()) {
+				String testcase = m.group();
+				StringBuilder parameterString = new StringBuilder();
+				Matcher m2 = Pattern.compile("(?i)(?s)<pre>(.*?)<\\/pre>").matcher(testcase); //$NON-NLS-1$
+				while(m2.find()) {
+					String s = m2.group(1);
+					s = s.replaceAll("&quot;", "\"");
+					s = s.replaceAll("&apos;", "'");
+					if(s.startsWith("Returns: ")) {
+						result.add(new StringPair(s.substring(9), parameterString.toString()));
+					} else {
+						if(parameterString.length() > 0)
+							parameterString.append(',');
+						parameterString.append(s);
+					}
+				}
 			}
-			result.add(new StringPair(expectedString, parameterString));
+//			result.add(new StringPair(expectedString, parameterString));
 		}
 
 		return result;
@@ -369,10 +384,11 @@ class ProblemScraper {
 		return readAll(openStream(subdomain, path));
 	}
 
+	@SuppressWarnings("static-method")
 	private InputStream openStream(String subdomain, String path) throws Exception {
 		URL url = new URL("http://" + subdomain + ".topcoder.com/" + path); //$NON-NLS-1$
 		URLConnection connection = url.openConnection();
-		connection.setRequestProperty("Cookie", httpCookies); //$NON-NLS-1$
+//		connection.setRequestProperty("Cookie", httpCookies); //$NON-NLS-1$
 		return connection.getInputStream();
 	}
 
